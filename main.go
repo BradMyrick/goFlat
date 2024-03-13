@@ -16,8 +16,10 @@ var folderPath string
 
 func main() {
 	cmd := &cobra.Command{
-		Use:   "folder2pdf",
+		Use:   "goFlat",
 		Short: "Converts a folder structure to a flattened PDF",
+		Long: "goFlat is a tool to convert a folder structure to a flattened PDF. " +
+			"It walks the folder tree and adds the folder structure and file contents to the PDF.",
 		Run:   run,
 	}
 
