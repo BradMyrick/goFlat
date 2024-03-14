@@ -1,79 +1,55 @@
+```markdown
 # goFlat
 
-goFlat is a Go program that takes a folder location as input and generates a flattened PDF file with the folder structure and code contents. 
+goFlat is a versatile command-line tool written in Go, designed to flatten the structure of a given directory into a single document. It supports generating both PDF and text files, excluding binary and image files to focus on code and readable content.
 
 ## Features
 
-- Command-line interface using Cobra
-- Reads folder path from command-line flag `--folder` or `-f`
-- Walks the specified folder and subfolders 
-- Adds folder structure to PDF with bold font
-- Includes code contents of each file in monospace font below folder
-- Ignores hidden files and folders starting with `.`
-- Ignores `.git` folder
-- Generates PDF with name of root folder 
+- **Flexible Output**: Generates flattened representations of directories in PDF or text format.
+- **Selective Flattening**: Automatically excludes binary and image files, focusing on textual content.
+- **Command-Line Interface**: Easy to integrate into scripts or workflows for automation.
+- **Customizable**: Supports various flags for customization, including specifying the directory to flatten.
 
 ## Installation
 
-```
+Ensure you have Go installed on your system, then run:
+
+```bash
 go get github.com/BradMyrick/goFlat
 ```
 
 ## Usage
 
-```
-goFlat --folder /path/to/folder
-```
+To flatten a directory into a PDF, excluding binary and image files:
 
-Or 
-
-```
-goFlat -f /path/to/folder
+```bash
+goFlat pdf --folder /path/to/folder
 ```
 
-This will generate a PDF file named `folder.pdf` in the current directory with the flattened contents.
+To generate a text file instead:
 
-## Example
-
-For a folder structure like:
-
-```
-root/
-    cmd/
-        cmd.go
-    rpc/
-        rpc.go
+```bash
+goFlat txt --folder /path/to/folder
 ```
 
-The generated PDF would look like:
+Both commands will produce an output file named after the root folder with the appropriate extension in the current directory.
 
-```
-root
-    cmd
-        cmd.go 
-            package main
-            import "fmt"
-            func main() {
-                fmt.Println("cmd.go")
-            }
-    rpc
-        rpc.go
-            package rpc 
-            func DoRPC() {
-            }
-```
+## Contributing
 
-## Implementation Details
+Contributions are welcome! If you have suggestions for improvements or encounter any issues, please file them on the project's issues page.
 
-The key implementation aspects are:
+Before contributing, please ensure your code adheres to the Go community coding standards and includes appropriate tests. For significant changes, please open an issue first to discuss what you would like to change.
 
-- Using Cobra for CLI 
-- Using Viper to read folder flag
-- Walking folder tree with `filepath.Walk`
-- Adding folder paths with `pdf.SetFont("Arial", "B", 14)` 
-- Adding file contents with `pdf.SetFont("Courier", "", 10)`
-- Generating PDF with gofpdf library
-- Ignoring hidden files/folders by checking `strings.HasPrefix(info.Name(), ".")`
+## License
 
-created by kodr.eth
+goFlat is released under the MIT License. See the LICENSE file for more details.
+
+## TODO's
+
+- [ ] Add gitignore file.
+- [ ] Add support for custom output file names and paths.
+- [ ] Implement support for additional file types, such as Markdown and HTML.
+- [ ] Add support for customizing the output format, such as font size and color.
+- [ ] Implement support for flattening nested directories.
+
 ```
