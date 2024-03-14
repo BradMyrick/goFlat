@@ -46,7 +46,7 @@ goFlat is released under the MIT License. See the LICENSE file for more details.
 
 ## TODO's
 
-- [ ] Add gitignore file.
+- [x] Add gitignore file. *complete*
 - [ ] Add support for custom output file names and paths.
 - [ ] Implement support for additional file types, such as Markdown and HTML.
 - [ ] Add support for customizing the output format, such as font size and color.
