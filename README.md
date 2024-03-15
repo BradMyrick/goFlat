@@ -1,4 +1,3 @@
-```markdown
 # goFlat
 
 goFlat is a versatile command-line tool written in Go, designed to flatten the structure of a given directory into a single document. It supports generating both PDF and text files, excluding binary and image files to focus on code and readable content.
@@ -15,7 +14,7 @@ goFlat is a versatile command-line tool written in Go, designed to flatten the s
 Ensure you have Go installed on your system, then run:
 
 ```bash
-go get github.com/BradMyrick/goFlat
+go install github.com/BradMyrick/goFlat
 ```
 
 ## Usage
