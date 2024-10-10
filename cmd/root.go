@@ -16,98 +16,63 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "goFlat",
+		Use:                "goFlat",
 		PersistentPreRunE:  rootPersistentPreRunE,
 		PersistentPostRunE: rootPersistentPostRunE,
-		Short: "Converts a folder structure to a flattened single file",
-		Long: "goFlat is a tool to convert a folder structure to a flattened PDF " +
-			"or txt file by walking the folder tree and adding the folder structure " +
-			"and file contents to the file",
-			}
-		folderPath string
-
-
+		Short:              "Converts a folder structure to a flattened single file",
+		Long: `goFlat is a tool to convert a folder structure to a flattened PDF or text file.
+It walks the folder tree, adding the folder structure and file contents to the output file.
+Binary and image files are automatically excluded to focus on textual content.`,
+	}
+	folderPath string
+	verbose    bool
 )
 
 func init() {
-
-	// Use environment variables that match our flags.
 	viper.AutomaticEnv()
-
 	viper.SetEnvPrefix("goFlat")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	
-	rootCmd.PersistentFlags().StringP(
-		"folder",
-		"f",
-		"",
-		"Folder path to convert (required)",
-	)
-
+	rootCmd.PersistentFlags().StringVarP(&folderPath, "folder", "f", "", "Folder path to convert (required)")
 	viper.BindPFlag("folder", rootCmd.PersistentFlags().Lookup("folder"))
 	viper.BindEnv("folder")
-
 	rootCmd.MarkPersistentFlagRequired("folder")
 
-	rootCmd.PersistentFlags().StringP(
-		"log-level",
-		"l",
-		"info",
-		"Log verbosity level (debug, info, warn, error, fatal, panic).",
-	)
-	viper.BindPFlag(
-		"log.level",
-		rootCmd.PersistentFlags().Lookup("log-level"),
-	)
+	rootCmd.PersistentFlags().StringP("log-level", "l", "info", "Log verbosity level (debug, info, warn, error, fatal, panic)")
+	viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
 	viper.BindEnv("log.level")
+
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-func Execute() (err error) {	
-	// Initialize root context.
+func Execute() error {
 	ctx := context.Background()
-	
-
-	// Execute the command.
-	_, err = rootCmd.ExecuteContextC(ctx)
-	return err
-	
+	return rootCmd.ExecuteContext(ctx)
 }
 
-func rootPersistentPreRunE(command *cobra.Command, args []string) (err error) {
-
-
-
-	// Configure logging.
-	var logger *zap.Logger
-	if logger, err = obs.NewZap(); err != nil {
+func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
+	logger, err := obs.NewZap()
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "logger initialization error: %v\n", err)
-		return
+		return err
 	}
 
-	// Dump the configuration
 	settings := viper.AllSettings()
-	// Remove sensitive information.
-	// ... e.g. database.username and database.password
 	config, _ := json.Marshal(settings)
 	logger.Info("configuration", zap.String("settings", string(config)))
 
-	// Update the command context.
-	command.SetContext(obs.WithLogger(command.Context(), logger))
-	return
-
-} // func cmd.rootPersistentPreRunE()
-
-func rootPersistentPostRunE(command *cobra.Command, args []string) (err error) {
-
-	// Flush the log.
-	if err = obs.Logger(command.Context()).Sync(); err != nil {
-		// invalid argument on linux for stdout/stderr.
-		if _, ok := err.(*fs.PathError); ok {
-			err = nil
-		}
+	if verbose {
+		logger.Info("verbose logging enabled")
 	}
-	return
 
-} // func cmd.rootPersistentPostRunE()
+	cmd.SetContext(obs.WithLogger(cmd.Context(), logger))
+	return nil
+}
+
+func rootPersistentPostRunE(cmd *cobra.Command, args []string) error {
+	err := obs.Logger(cmd.Context()).Sync()
+	if _, ok := err.(*fs.PathError); ok {
+		err = nil
+	}
+	return err
+}
